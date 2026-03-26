@@ -35,8 +35,8 @@ uvicorn app.main:app --reload
 This repository is Python-only. If Railway tries `npm install`, your service is using the wrong builder/settings.
 
 Included deploy files:
-- `nixpacks.toml` (forces Python setup/install/start)
-- `railway.json` (explicit start command)
+- `nixpacks.toml` (forces Python toolchain and bootstraps pip with `ensurepip`)
+- `railway.json` (explicit start command + healthcheck)
 - `Procfile` (web process fallback)
 - `requirements.txt` (dependency source for deploy)
 
@@ -45,6 +45,11 @@ Included deploy files:
 2. **Root Directory**: repository root (where `requirements.txt` exists)
 3. **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 4. Remove any old **Build Command** like `npm install`
+5. Make sure command is **`app.main:app`** (not `main:app`)
+
+### If you see `No module named pip` during build
+This repo now runs `python -m ensurepip --upgrade` before installing dependencies.
+That bootstraps pip in environments where Python is present but pip is missing.
 
 ## Gemini configuration
 Create a `.env` file:
