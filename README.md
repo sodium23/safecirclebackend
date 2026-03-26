@@ -35,7 +35,7 @@ uvicorn app.main:app --reload
 This repository is Python-only. If Railway tries `npm install`, your service is using the wrong builder/settings.
 
 Included deploy files:
-- `nixpacks.toml` (forces Python toolchain and relies on Nixpacks default Python install flow)
+- `nixpacks.toml` (forces Python toolchain and bootstraps pip with `ensurepip`)
 - `railway.json` (explicit start command + healthcheck)
 - `Procfile` (web process fallback)
 - `requirements.txt` (dependency source for deploy)
@@ -47,20 +47,9 @@ Included deploy files:
 4. Remove any old **Build Command** like `npm install`
 5. Make sure command is **`app.main:app`** (not `main:app`)
 
-### If build fails around pip/ensurepip
-Use this repository root as service root, keep builder as `NIXPACKS`, and avoid custom pre-build commands.
-The project now relies on Railway/Nixpacks default Python dependency install flow from `requirements.txt`.
-
-### If Railway is still using an old repository
-This is a Railway project-link issue (not backend code). Do this in Railway UI:
-1. Open the service → **Settings** → **Source**.
-2. Disconnect current GitHub repo.
-3. Reconnect and select the correct repository + branch.
-4. Confirm **Root Directory** is this backend repo root.
-5. In **Variables/Settings**, remove stale custom Build/Start overrides copied from the old repo.
-6. Trigger **Redeploy** (or "Deploy Latest Commit").
-
-Tip: if the deploy log references files you do not have in this repo, Railway is still linked to the wrong source or root directory.
+### If you see `No module named pip` during build
+This repo now runs `python -m ensurepip --upgrade` before installing dependencies.
+That bootstraps pip in environments where Python is present but pip is missing.
 
 ## Gemini configuration
 Create a `.env` file:
