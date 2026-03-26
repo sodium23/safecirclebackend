@@ -27,9 +27,24 @@ This repo is intentionally frontend-agnostic so mobile/web clients can call its 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e .[dev]
+pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+
+## Railway deployment (important)
+This repository is Python-only. If Railway tries `npm install`, your service is using the wrong builder/settings.
+
+Included deploy files:
+- `nixpacks.toml` (forces Python setup/install/start)
+- `railway.json` (explicit start command)
+- `Procfile` (web process fallback)
+- `requirements.txt` (dependency source for deploy)
+
+### Railway service settings to verify
+1. **Builder**: `NIXPACKS`
+2. **Root Directory**: repository root (where `requirements.txt` exists)
+3. **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Remove any old **Build Command** like `npm install`
 
 ## Gemini configuration
 Create a `.env` file:
