@@ -35,33 +35,21 @@ uvicorn app.main:app --reload
 This repository is Python-only. If Railway tries `npm install`, your service is using the wrong builder/settings.
 
 Included deploy files:
-- `nixpacks.toml` (forces Python toolchain and relies on Nixpacks default Python install flow)
-- `railway.json` (Dockerfile builder + healthcheck/restart policy)
+- `nixpacks.toml` (forces Python toolchain and bootstraps pip with `ensurepip`)
+- `railway.json` (explicit start command + healthcheck)
 - `Procfile` (web process fallback)
 - `requirements.txt` (dependency source for deploy)
 
 ### Railway service settings to verify
-1. **Builder**: `DOCKERFILE`
-2. **Dockerfile Path**: `Dockerfile`
-3. **Root Directory**: repository root
-4. **Start Command**: leave blank (use Docker `CMD`) or set `sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"`
-5. Remove any old **Build Command** like `npm install`
-6. Make sure app target is **`app.main:app`** (not `main:app`)
+1. **Builder**: `NIXPACKS`
+2. **Root Directory**: repository root (where `requirements.txt` exists)
+3. **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Remove any old **Build Command** like `npm install`
+5. Make sure command is **`app.main:app`** (not `main:app`)
 
-### Why Dockerfile builder
-Recent failures were from Nixpacks Python bootstrap (`ensurepip`).
-Using the Dockerfile builder avoids that path entirely and gives deterministic Python + pip behavior.
-
-### If Railway is still using an old repository
-This is a Railway project-link issue (not backend code). Do this in Railway UI:
-1. Open the service → **Settings** → **Source**.
-2. Disconnect current GitHub repo.
-3. Reconnect and select the correct repository + branch.
-4. Confirm **Root Directory** is this backend repo root.
-5. In **Variables/Settings**, remove stale custom Build/Start overrides copied from the old repo.
-6. Trigger **Redeploy** (or "Deploy Latest Commit").
-
-Tip: if the deploy log references files you do not have in this repo, Railway is still linked to the wrong source or root directory.
+### If you see `No module named pip` during build
+This repo now runs `python -m ensurepip --upgrade` before installing dependencies.
+That bootstraps pip in environments where Python is present but pip is missing.
 
 ## Gemini configuration
 Create a `.env` file:

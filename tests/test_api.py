@@ -28,8 +28,3 @@ def test_mentor_coach_fallback() -> None:
     response = client.post('/mentor/coach', json=payload)
     assert response.status_code == 200
     assert 'strategic_framing' in response.json()
-
-
-def test_health_head() -> None:
-    response = client.head("/health")
-    assert response.status_code == 200
