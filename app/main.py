@@ -17,5 +17,7 @@ app.include_router(mentor_router)
 
 
 @app.get("/")
+def test():
+    return {"message": "alive"}
 def root() -> dict[str, str]:
     return {"message": "SaferCircle backend is running"}
