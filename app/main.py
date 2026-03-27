@@ -1,7 +1,46 @@
 from fastapi import FastAPI
+import os
 
 app = FastAPI()
 
+# -------------------------
+# HEALTH CHECK (DO NOT TOUCH)
+# -------------------------
 @app.get("/")
 def home():
-    return "alive"
+    return {"status": "alive"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+# -------------------------
+# SAFE GEMINI SETUP
+# -------------------------
+def get_model():
+    import google.generativeai as genai
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise Exception("Missing GEMINI_API_KEY")
+
+    genai.configure(api_key=api_key)
+
+    return genai.GenerativeModel("gemini-2.5-flash")
+
+
+# -------------------------
+# CHAT ENDPOINT
+# -------------------------
+@app.get("/chat")
+def chat(message: str):
+    try:
+        model = get_model()  # initialized ONLY when needed
+        response = model.generate_content(message)
+        return {"reply": response.text}
+    except Exception as e:
+        return {
+            "reply": "AI temporarily unavailable. Stay in a safe place.",
+            "error": str(e),
+            "degraded": True
+        }
