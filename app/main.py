@@ -53,3 +53,18 @@ def chat(message: str):
             "error": str(e),
             "degraded": True
         }
+
+@app.get("/scenario/today")
+def scenario():
+    return {
+        "situation": "A stranger is following you late at night.",
+        "choices": [
+            {"id": "a", "text": "Ignore and keep walking"},
+            {"id": "b", "text": "Enter a nearby shop"},
+        ],
+        "outcomes": {
+            "a": "Risk increases as isolation continues.",
+            "b": "You move into a safer public space."
+        },
+        "power_move": "Always move toward visibility and people."
+    }
