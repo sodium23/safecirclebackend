@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("SafeCircle backend is ready to accept requests.")
+    port = os.getenv("PORT", "8000")
+    logger.info("SafeCircle backend is ready to accept requests on 0.0.0.0:%s", port)
     yield
     logger.info("SafeCircle backend is shutting down.")
 
